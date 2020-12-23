@@ -2,6 +2,8 @@
 ;;--------------------------------------------------BASE DE REGLE----------------------------------------------------------
 ;;-------------------------------------------------------------------------------------------------------------------------
 
+;;formulaire : (Ri ((premise1) (premise2) ....) (conclusion))
+
 (setq *BDR* '(
               (R1 ((Etat_Matiere plasma) (Forme sphere) (Mode_Lumineux radiation)) (Type etoile))   
               (R2 ((Type Etoile) (Reaction_nucleaire normal)) (Type etoile_sequence_principale))
@@ -142,9 +144,27 @@
 )
 
 ;;此函数用于寻找对于当前bdf来说可以用于进行下一步推理的regle列表
-(defun regleSuffisant (bdf)
-   
+(defun regleSuffisant (bdf bdr)
+  (let ((regleSuff nil))
+    (dolist (regle bdr)
+       (let ((verifier t))
+         (dolist (champ_regle (cadr regle))
+             (cond
+               ((equal (car champ_regle) 'Masse) 
+                 (if (member (cadr champ_regle) (cadr (assoc (car champ_regle) bdf)) : test 'equal)
+                   nil (setq verifier nil)))
+               (t 
+                 (if (member champ_regle bdf : test 'equal) 
+                   nil (setq verifier nil)))
+             )
+         )
+         (if (equal verifier t) (push regle regleSuff))
+       )
+    )
+    regleSUff
+  )
 )
+
 
 ;;------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------moteur d'inference--------------------------------------------------------
