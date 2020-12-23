@@ -141,11 +141,32 @@
   )    
 )
 
+;;此函数用于寻找对于当前bdf来说可以用于进行下一步推理的regle列表
+(defun regleSuffisant (bdf)
+   
+)
+
 ;;------------------------------------------------------------------------------------------------------------------------
 ;;----------------------------------------------moteur d'inference--------------------------------------------------------
 ;;------------------------------------------------------------------------------------------------------------------------
 
+(defun moteur_inference (choix_chainage)
+   (cond
+     ((equal choix_chainage 'avant)
+        (let ((choix nil))
+          (format t "Chainage avant en profondeur d'abord ou en largeur d'abord ? ~%")
+          (setq choix (read))
+          (if (equal choix 'profondeur) (avant_Profondeur *BDF* *BDR*) (avant_Largeur *BDF* *BDR*))
+        )
+     )
+     ((equal choix_chainage 'arriere) (arriere_Profondeur *BDF* *BDR*))
+   )
+   (format t "Finish !")
+)
+
 ;;1er cas : chainage avant en profondeur d'abord
+(defun )
+
 
 ;;2eme cas : chainage avant en largeur d'abord
 
