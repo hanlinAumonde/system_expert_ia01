@@ -37,47 +37,51 @@
 
 ;;Exemple d'un base de faits
 ;;以地球的数据为例
-(setq *BDF* '(
-              (Etat_matiere roche)
-              (Forme sphere)
-              (Mode_Lumineux nil)
-              (Orbite_Etoile t)
-              (Orbite_Planete nil)
-              (Reaction_nucleaire nil)
-              (Masse 3.0e-6)
-              (Vitesse_Rot 86400)
-              (Effacer_Voisine t)
-              (Horizon_evenement nil)
-              (Position incertain)
-              ))
+;;(setq *BDF* '(
+              ;;(Etat_matiere roche)
+              ;;(Forme sphere)
+              ;;(Mode_Lumineux nil)
+              ;;(Orbite_Etoile t)
+              ;;(Orbite_Planete nil)
+              ;;(Reaction_nucleaire nil)
+              ;;(Masse 3.0e-6)
+              ;;(Vitesse_Rot 86400)
+              ;;(Effacer_Voisine t)
+              ;;(Horizon_evenement nil)
+              ;;(Position incertain)
+              ;;))
 ;;Masse 数据以太阳为标准，如上例中地球质量为3.0e-6（0.000003）倍的太阳质量
 ;;Vitesse_Rot 数据单位为秒，即天体自转一圈所需的时间，如上例中地球自转（24*60*60=86400s）
 
 
-;;--------------------------------------------
-;;-----------init_BDF-------------------------
-;;--------------------------------------------
+;;----------------------------------------------------------
+;;-----------initialisation du BDF--------------------------
+;;----------------------------------------------------------
 
 (setq list_champs '(Etat_matiere Forme Mode_Lumineux Orbite_Etoile Orbite_Planete Reaction_nucleaire Masse Vitesse_Rot Horizon_evenement Position))
+
+(setq *BDF* nil)
 
 (defun init_BDF ()
   (format t "Veuillez saisir les données du corps céleste ：~%")
     (dolist (champ list_champs)
        (init_Champs champ)
   )
-  (print "initialisation a fini !")
+  (format t "initialisation a fini !")
 )
 
 (defun init_Champs (nom_Champ)
-    (format t "Quelle est ~S matérielle du corps céleste ?~%" nom_Champ)
-    (setq valeur (read))
-    (setq *BDF* (append *BDF* (list (list nom_Champ valeur))))
+   (let ((valeur nil))
+     (format t "Quelle est le ~S matérielle du corps céleste ?~%" nom_Champ)
+     (setq valeur (read))
+     (setq *BDF* (append *BDF* (list (list nom_Champ valeur))))
+   )
 )
 
 
-;;--------------------------------------------
-;;-----------fonction utile-------------------
-;;--------------------------------------------
+;;----------------------------------------------------------
+;;-----------fonction utile---------------------------------
+;;----------------------------------------------------------
 
 (defun Transformation_donnee (bdf)
   (Transform_Matiere bdf)
@@ -85,4 +89,50 @@
   (Transform_Vitesse_Rot bdf)
 )
 
-(defun )
+(defun Transform_Matiere (bdf)
+  (let ((matiere (cadr (assoc 'Etat_Matiere bdf))))
+     (cond 
+       ((or
+          (equal matiere 'roche)
+          (equal matiere 'glace)
+          (equal matiere 'metal)
+        )
+        (setf (nth 1 (nth 0 bdf)) 'solide))
+       ((or 
+          (equal matiere 'hydrogene)
+          (equal matiere 'helium)
+          )
+        (setf (nth 1 (nth 0 bdf)) 'gaz)) 
+      )
+  )    
+)
+
+(defun Transform_Masse (bdf)
+   (let ((masse (cadr (assoc 'Masse bdf))) (list_interval_masse nil))
+       (if (and (> masse 0.17) (< masse 1.33)) 
+         (setq list_interval_masse (append list_interval_masse (list (list 0.17 1.33))))
+       )
+       (if (and (> masse 1.35) (< masse 2.1))
+         (setq list_interval_masse (append list_interval_masse (list (list 1.35 2.1))))
+       )
+       (if (and (> masse 0.3) (< masse 8)) 
+         (setq list_interval_masse (append list_interval_masse (list (list 0.3 8))))
+       )
+       (if (> masse 3.3)
+         (setq list_interval_masse (append list_interval_masse (list (list '> 3.3))))
+       )
+       (if (> masse 1000000)
+         (setq list_interval_masse (append list_interval_masse (list (list '> 1000000))))
+       )
+       (setf (nth 1 (nth 6 bdf)) list_interval_masse)
+   )
+)
+
+(defun Transform_Rot (bdf)
+  (let ((vitesse (cadr (assoc 'Vitesse_Rot bdf))))
+       (if (<= vitesse 30)
+           (setf (nth 1 (nth 7 bdf)) 'rapide)
+         (setf (nth 1 (nth 7 bdf)) 'normal)
+       )
+  )    
+)
