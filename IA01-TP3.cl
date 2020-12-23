@@ -67,7 +67,7 @@
     (dolist (champ list_champs)
        (init_Champs champ)
   )
-  (format t "initialisation a fini !")
+  (format t "initialisation finish !")
 )
 
 (defun init_Champs (nom_Champ)
@@ -87,6 +87,7 @@
   (Transform_Matiere bdf)
   (Transform_Masse bdf)
   (Transform_Vitesse_Rot bdf)
+  (format t "Transformation finish")
 )
 
 (defun Transform_Matiere (bdf)
