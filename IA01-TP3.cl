@@ -19,24 +19,24 @@
               (R16 ((Reaction_nucleaire nil) (Orbite_Planete t) (Orbite_Etoile nil) (Effacer_Voisine nil)) (Type satellite))
 ))
   ;;valeur possible:
-    ;;Etat_matiere£¨ÎïÖÊ×´Ì¬£© : solide(¹ÌÌ¬) / gaz£¨ÆøÌ¬£© / plasma£¨µÈÀë×ÓÌå£© / degeneree£¨¼ò²¢Ì¬£©
-    ;;Mode_Lumineux£¨·¢¹âÄ£Ê½£© : radiation(·øÉä) / nil
-    ;;Type£¨ÀàĞÍ£© : etoile£¨ºãĞÇ£© / etoile_compacte£¨ÖÂÃÜĞÇ£© / nain_blanc£¨°×°«ĞÇ£© / etoile_neutron£¨ÖĞ×ÓĞÇ£©
-                     pulsar(Âö³åĞÇ) / geante_rouge£¨ºì¾ŞĞÇ£©/ trou_noir£¨ºÚ¶´£©/ planete£¨ĞĞĞÇ£©/ planete_naine_gazeuse£¨ÆøÌ¬°«ĞĞĞÇ£©
-                     planete_jovienne£¨ÀàÄ¾ĞĞĞÇ£© / planete_tellurique£¨ÀàµØĞĞĞÇ£©/ planete_naine£¨°«ĞĞĞÇ£©
-                     asteroide£¨Ğ¡ĞĞĞÇ£© / satellite£¨ÎÀĞÇ£©/ etoile_sequence_principale£¨Ö÷ĞòĞÇ£©
-    ;;Reaction_nucleaire£¨ºË·´Ó¦£© : normal / nil / pres_de_fin
-    ;;Masse : bdfÀïÎªÊıÖµĞÎÊ½£¬Í¨¹ıÌØ¶¨º¯Êı×ª»¯Îªb drÖĞmasseµÄÃèÊöĞÎÊ½
-    ;;Vitesse_Rot£¨×Ô×ªËÙ¶È£© : rapide / normal £¨Í¬ÉÏ£¬½«ÊıÖµ×ª»¯ÎªÃèÊö£©
-    ;;Horizon_evenement£¨ÊÂ¼şÊÓ½ç£© : t / nil
+    ;;Etat_matiereï¼ˆç‰©è´¨çŠ¶æ€ï¼‰ : solide(å›ºæ€) / gazï¼ˆæ°”æ€ï¼‰ / plasmaï¼ˆç­‰ç¦»å­ä½“ï¼‰ / degenereeï¼ˆç®€å¹¶æ€ï¼‰
+    ;;Mode_Lumineuxï¼ˆå‘å…‰æ¨¡å¼ï¼‰ : radiation(è¾å°„) / nil
+    ;;Typeï¼ˆç±»å‹ï¼‰ : etoileï¼ˆæ’æ˜Ÿï¼‰ / etoile_compacteï¼ˆè‡´å¯†æ˜Ÿï¼‰ / nain_blancï¼ˆç™½çŸ®æ˜Ÿï¼‰ / etoile_neutronï¼ˆä¸­å­æ˜Ÿï¼‰
+                    ;;pulsar(è„‰å†²æ˜Ÿ) / geante_rougeï¼ˆçº¢å·¨æ˜Ÿï¼‰/ trou_noirï¼ˆé»‘æ´ï¼‰/ planeteï¼ˆè¡Œæ˜Ÿï¼‰/ planete_naine_gazeuseï¼ˆæ°”æ€çŸ®è¡Œæ˜Ÿï¼‰
+                    ;;planete_jovienneï¼ˆç±»æœ¨è¡Œæ˜Ÿï¼‰ / planete_telluriqueï¼ˆç±»åœ°è¡Œæ˜Ÿï¼‰/ planete_naineï¼ˆçŸ®è¡Œæ˜Ÿï¼‰
+                    ;;asteroideï¼ˆå°è¡Œæ˜Ÿï¼‰ / satelliteï¼ˆå«æ˜Ÿï¼‰/ etoile_sequence_principaleï¼ˆä¸»åºæ˜Ÿï¼‰
+    ;;Reaction_nucleaireï¼ˆæ ¸ååº”ï¼‰ : normal / nil / pres_de_fin
+    ;;Masse : bdfé‡Œä¸ºæ•°å€¼å½¢å¼ï¼Œé€šè¿‡ç‰¹å®šå‡½æ•°è½¬åŒ–ä¸ºb drä¸­masseçš„æè¿°å½¢å¼
+    ;;Vitesse_Rotï¼ˆè‡ªè½¬é€Ÿåº¦ï¼‰ : rapide / normal ï¼ˆåŒä¸Šï¼Œå°†æ•°å€¼è½¬åŒ–ä¸ºæè¿°ï¼‰
+    ;;Horizon_evenementï¼ˆäº‹ä»¶è§†ç•Œï¼‰ : t / nil
     ;;Position : centre_galaxie / incertain
-    ;;Forme£¨ĞÎ×´£© : sphere / irregulier£¨²»¹æÔò£©
-    ;;Orbite_Etoile£¨ÈÆºãĞÇÔËĞĞ£© : t / nil
-    ;;Effacer_Voisine£¨Çå¿Õ¹ìµÀ¸½½üÇøÓò£© :  t / nil
-    ;;Orbite_Planete£¨ÈÆĞĞĞÇÔËĞĞ£© : t / nil
+    ;;Formeï¼ˆå½¢çŠ¶ï¼‰ : sphere / irregulierï¼ˆä¸è§„åˆ™ï¼‰
+    ;;Orbite_Etoileï¼ˆç»•æ’æ˜Ÿè¿è¡Œï¼‰ : t / nil
+    ;;Effacer_Voisineï¼ˆæ¸…ç©ºè½¨é“é™„è¿‘åŒºåŸŸï¼‰ :  t / nil
+    ;;Orbite_Planeteï¼ˆç»•è¡Œæ˜Ÿè¿è¡Œï¼‰ : t / nil
 
 ;;Base de faits
-;;ÒÔµØÇòµÄÊı¾İÎªÀı
+;;ä»¥åœ°çƒçš„æ•°æ®ä¸ºä¾‹
 (setq *BDF* '(
               (Etat_matiere roche)
               (Forme sphere)
@@ -50,8 +50,8 @@
               (Horizon_evenement nil)
               (Position incertain)
               ))
-;;Masse Êı¾İÒÔÌ«ÑôÎª±ê×¼£¬ÈçÉÏÀıÖĞµØÇòÖÊÁ¿Îª3.0e-6£¨0.000003£©±¶µÄÌ«ÑôÖÊÁ¿
-;;Vitesse_Rot Êı¾İµ¥Î»ÎªÃë£¬¼´ÌìÌå×Ô×ªÒ»È¦ËùĞèµÄÊ±¼ä£¬ÈçÉÏÀıÖĞµØÇò×Ô×ª£¨24*60*60=86400s£©
+;;Masse æ•°æ®ä»¥å¤ªé˜³ä¸ºæ ‡å‡†ï¼Œå¦‚ä¸Šä¾‹ä¸­åœ°çƒè´¨é‡ä¸º3.0e-6ï¼ˆ0.000003ï¼‰å€çš„å¤ªé˜³è´¨é‡
+;;Vitesse_Rot æ•°æ®å•ä½ä¸ºç§’ï¼Œå³å¤©ä½“è‡ªè½¬ä¸€åœˆæ‰€éœ€çš„æ—¶é—´ï¼Œå¦‚ä¸Šä¾‹ä¸­åœ°çƒè‡ªè½¬ï¼ˆ24*60*60=86400sï¼‰
 
 
 ;;--------------------------------------------
