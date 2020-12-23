@@ -35,7 +35,7 @@
     ;;Effacer_Voisine（清空轨道附近区域） :  t / nil
     ;;Orbite_Planete（绕行星运行） : t / nil
 
-;;Base de faits
+;;Exemple d'un base de faits
 ;;以地球的数据为例
 (setq *BDF* '(
               (Etat_matiere roche)
@@ -52,6 +52,27 @@
               ))
 ;;Masse 数据以太阳为标准，如上例中地球质量为3.0e-6（0.000003）倍的太阳质量
 ;;Vitesse_Rot 数据单位为秒，即天体自转一圈所需的时间，如上例中地球自转（24*60*60=86400s）
+
+
+;;--------------------------------------------
+;;-----------init_BDF-------------------------
+;;--------------------------------------------
+
+(setq list_champs '(Etat_matiere Forme Mode_Lumineux Orbite_Etoile Orbite_Planete Reaction_nucleaire Masse Vitesse_Rot Horizon_evenement Position))
+
+(defun init_BDF ()
+  (format t "Veuillez saisir les données du corps céleste ：~%")
+    (dolist (champ list_champs)
+       (init_Champs champ)
+  )
+  (print "initialisation a fini !")
+)
+
+(defun init_Champs (nom_Champ)
+    (format t "Quelle est ~S matérielle du corps céleste ?~%" nom_Champ)
+    (setq valeur (read))
+    (setq *BDF* (append *BDF* (list (list nom_Champ valeur))))
+)
 
 
 ;;--------------------------------------------
