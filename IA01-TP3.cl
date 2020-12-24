@@ -54,6 +54,7 @@
               ;;(Effacer_Voisine t)
               ;;(Horizon_evenement nil)
               ;;(Position incertain)
+              ;;(Signal_Impulsion nil)
               ;;(Type inconnu) 
               ;;))
 ;;Masse 数据以太阳为标准，如上例中地球质量为3.0e-6（0.000003）倍的太阳质量
@@ -64,7 +65,7 @@
 ;;---------------------------------------------initialisation du BDF-----------------------------------------------------
 ;;-----------------------------------------------------------------------------------------------------------------------
 
-(setq list_champs '(Etat_matiere Forme Mode_Lumineux Orbite_Etoile Orbite_Planete Reaction_nucleaire Masse Vitesse_Rot Horizon_evenement Position Signal_Impulsion))
+(setq list_champs '(Etat_matiere Forme Mode_Lumineux Orbite_Etoile Orbite_Planete Reaction_nucleaire Masse Vitesse_Rot Effacer_Voisine Horizon_evenement Position Signal_Impulsion))
 
 (setq *BDF* nil)
 
@@ -224,7 +225,9 @@
       )
    )
    ((equal choix_chainage 'arriere)
-      (arriere_Largeur )
+      (format t "~%~% Veuillez saisir le type de corps céleste que vous souhaitez confirmer :~%~%")
+      (setq type_celeste_BUT (read))
+      (arriere_Largeur type_celeste_BUT *BDF* *BDR*)
    )
    )
 )
@@ -236,7 +239,7 @@
     (cond 
       ((not (null regleS))
           (push (car regleS) regleOld)
-       (while (and (not retourner) regleS)
+          (while (and (not retourner) regleS)
             (let ((type_copy (nth 1 (nth 12 bdf))))  
               (appliquer_regle (car regleS) bdr bdf)
               (setq retourner (avant_Profondeur bdf bdr regleOld))
@@ -259,6 +262,81 @@
 
 ;;2eme cas : chainage arriere en profondeur d'abord
 
+  ;;该函数用于寻找所有能够推出type_but的regle并写出对应条件（每一个regle的对应条件放在一个括号中）
+  (defun inference_inverse (type_but bdr)
+      (let ((list_conditions nil))
+        (dolist (x bdr) 
+           (if (equal (cadr (caddr x)) type_but) 
+               (setq list_conditions (append list_conditions (list (cadr x))))
+           )
+        )
+        list_conditions
+      )  
+  )
+
+;;该函数用于求两个list不同的部分（前一个相对于后一个的不同）
+(defun diff (L M) (cond ((null L) nil) ((member (car L) M :test 'equal) (diff (cdr L) M)) (t (cons (car L) (diff (cdr L) M)))))
+
+;;该函数用于逆推出所有能够推理得到list_conds的条件列表
+;;比如，若list_conds为((Type 中子星)) , 如果条件(Cond1 Cond2) , (Cond3 Cond4)各自都能推出这个list_conds,
+;;则该函数返回的result为((cond1 cond2) (cond3 cond4))
+;;同理，若list_conds为((Type 中子星) cond5),则result为((cond5 cond1 cond2) (cond5 cond3 cond4))
+(defun successeur (list_conds bdr)
+   (let ((result nil) (conds_sans_type nil)
+         (champ_type (assoc 'Type list_conds))
+         )
+     (setq conds_sans_type (diff list_conds (list champ_type)))
+     (cond
+     ((equal conds_sans_type nil)
+        (dolist (x (inference_inverse (cadr champ_type) bdr))
+           (setq result (append result (list x)))
+        )
+     )
+     ((not (null champ_type))
+        (dolist (x (inference_inverse (cadr champ_type) bdr))
+           (setq result (append result (list (append conds_sans_type x))))
+        )
+     )
+   result
+   )
+)
+
+;;该函数用于确认bdf是否满足给定的一组条件列表
+(defun verifier_conditions (list_conditions bdf)
+   (let ((res t) (mass (cadr (assoc 'Masse bdf))))
+   (dolist (x list_conditions)
+      (cond 
+        ((equal (car x) 'Masse) 
+           (if (not (member (cadr x) mass : test 'equal)) 
+               (setq res nil)
+           ))
+        ((not (member x bdf : test 'equal)) (setq res nil))
+      )
+   )
+   res)
+)
+
+(defun arriere_Largeur1 (list_cadidates bdf bdr CondsOld)
+     (format t "~%On a les conditions maintenant :~%")
+     (dolist (x list_cadidates)
+        (format t "~S ~%-------------------------------------------------------~%" x)   ;;显示当前未经确认的所有conditions
+        (if (equal (verifier_conditions x bdf) t) 
+           (return-from arriere_Largeur1 "Conditions verifiees avec succes !") ;;若bdf能够满足条件列表中任意一组条件，则显示成功并退出递归
+          (format t "et on n'a pas encore verifier les conditions dans le base de faits~%~%") ;;不满足则返回提示并继续递归
+        )
+     )
+     (format t "~%**************************************************************~%")
+   (cond 
+     ((not list_cadidates) nil)
+     (t (arriere_Largeur1 (diff (flatten (mapcar #'(lambda(xx) (successeur xx bdr)) list_cadidates)) CondsOld) bdf bdr 
+                                (append list_cadidates CondsOld))
+     )
+   )
+)
+
+(defun arriere_Largeur (type_but bdf bdr)
+    (arriere_Largeur1 (list type_but) bdf bdr nil)
+)
 
 
 ;;-----------------------------------------------------------------------------------------------------------------------
