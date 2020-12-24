@@ -165,6 +165,33 @@
 )
 
 
+;;------------------------------------------------------------------------------------------------------------------------
+;;----------------------------------------------moteur d'inference--------------------------------------------------------
+;;------------------------------------------------------------------------------------------------------------------------
+
+(defun moteur_inference (choix_chainage bdf bdr)
+  (cond 
+   ((equal choix_chainage 'avant) 
+      (avant_Profondeur bdf bdr nil)  
+      (if (equal (nth 1 (nth 12 bdf)) 'inconnu)
+        (progn
+        (format t "~%~% Error!Veuillez resaisir les donnees !~%~%")
+        (dolist (champ list_champs)
+          (init_Champs champ)
+        )
+        (moteur_inference 'avant bdf bdr)
+      )
+   )
+   ((equal choix_chainage 'arriere)
+      (format t "~%~% Veuillez saisir le type de corps céleste que vous souhaitez confirmer :~%~%")
+      (setq type_celeste_BUT (read))
+      (arriere_Largeur type_celeste_BUT *BDF* *BDR*)
+   )
+   )
+)
+
+;;1er cas : chainage avant en profondeur d'abord
+
 ;;此函数用于寻找对于当前bdf来说可以用于进行下一步推理的regle列表
 (defun regleSuffisant (bdf bdr)
   (let ((regleSuff nil))
@@ -193,7 +220,7 @@
   )
 )
 
-;;此函数用于执行regle
+;;此函数用于执行一条regle
 (defun appliquer_regle (regle bdr bdf)
   (if (equal (nth 1 (nth 12 bdf)) 'inconnu) 
       (format t "~%----------------------------------------------------------------------------------~%"))
@@ -206,33 +233,6 @@
   (format t "~%")
 )
 
-
-;;------------------------------------------------------------------------------------------------------------------------
-;;----------------------------------------------moteur d'inference--------------------------------------------------------
-;;------------------------------------------------------------------------------------------------------------------------
-
-(defun moteur_inference (choix_chainage bdf bdr)
-  (cond 
-   ((equal choix_chainage 'avant) 
-      (avant_Profondeur bdf bdr nil)  
-      (if (equal (nth 1 (nth 12 bdf)) 'inconnu)
-        (progn
-        (format t "~%~% Error!Veuillez resaisir les donnees !~%~%")
-        (dolist (champ list_champs)
-          (init_Champs champ)
-        )
-        (moteur_inference 'avant bdf bdr)
-      )
-   )
-   ((equal choix_chainage 'arriere)
-      (format t "~%~% Veuillez saisir le type de corps céleste que vous souhaitez confirmer :~%~%")
-      (setq type_celeste_BUT (read))
-      (arriere_Largeur type_celeste_BUT *BDF* *BDR*)
-   )
-   )
-)
-
-;;1er cas : chainage avant en profondeur d'abord
 (defun avant_Profondeur (bdf bdr regleOld)
   (let ((regleS (regleSuffisant bdf bdr)) 
         (retourner nil))
