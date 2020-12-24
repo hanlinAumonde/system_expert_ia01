@@ -64,7 +64,7 @@
 ;;---------------------------------------------initialisation du BDF-----------------------------------------------------
 ;;-----------------------------------------------------------------------------------------------------------------------
 
-(setq list_champs '(Etat_matiere Forme Mode_Lumineux Orbite_Etoile Orbite_Planete Reaction_nucleaire Masse Vitesse_Rot Horizon_evenement Position))
+(setq list_champs '(Etat_matiere Forme Mode_Lumineux Orbite_Etoile Orbite_Planete Reaction_nucleaire Masse Vitesse_Rot Horizon_evenement Position Signal_Impulsion))
 
 (setq *BDF* nil)
 
@@ -74,6 +74,7 @@
        (init_Champs champ)
       )
   (setq *BDF* (append *BDF* (list (list 'Type 'inconnu))))
+  (verifier_donnee *BDF*)
   (format t "initialisation finish !")
 )
 
@@ -85,6 +86,22 @@
    )
 )
 
+;;此函数用于确认用户输入的bdf数据类型是否符合要求（不需在意文字内容不在valeurpossible的情况，仅确认输入具体数值的项类型是否正确）
+(defun verifier_donnee (bdf)
+  (dolist (x bdf)
+      (if (or 
+            (equal (car x) 'Masse) 
+            (equal (car x) 'Vitesse_Rot)
+          )
+          (if (not (floatp (cadr x)))
+            (progn
+              (format t "Erreur-type : Resaisir ce champ svp")
+              (setf (cadr x) (read))
+            )
+          )
+      )
+  )
+)
 
 ;;-------------------------------------------------------------------------------------------------------------------------
 ;;-------------------------------------------------fonction utile----------------------------------------------------------
@@ -146,6 +163,7 @@
   )    
 )
 
+
 ;;此函数用于寻找对于当前bdf来说可以用于进行下一步推理的regle列表
 (defun regleSuffisant (bdf bdr)
   (let ((regleSuff nil))
@@ -164,8 +182,8 @@
          (if (and 
               (equal verifier t) 
               (or
-                 (member (nth 11 bdf) (cadr regle) : test 'equal)
-                 (equal (nth 1 (nth 11 bdf)) 'inconnu)
+                 (member (nth 12 bdf) (cadr regle) : test 'equal)
+                 (equal (nth 1 (nth 12 bdf)) 'inconnu)
               ))
               (push (car regle) regleSuff))
        )
@@ -176,12 +194,12 @@
 
 ;;此函数用于执行regle
 (defun appliquer_regle (regle bdr bdf)
-  (if (equal (nth 1 (nth 11 bdf)) 'inconnu) 
+  (if (equal (nth 1 (nth 12 bdf)) 'inconnu) 
       (format t "~%----------------------------------------------------------------------------------~%"))
   (if (member regle (regleSuffisant bdf bdr)) 
     (let ((regleComplet (assoc regle bdr)))
-      (format t "~%Type ancienne : ~S ~% les conditions ~S appliquent le regle ~S ~%Type maintenant : ~S" (nth 1 (nth 11 bdf)) (cadr regleComplet) regle (cadr (caddr regleComplet)))
-      (setf (nth 1 (nth 11 bdf)) (cadr (caddr regleComplet)))
+      (format t "~%Type ancienne : ~S ~% les conditions ~S appliquent le regle ~S ~%Type maintenant : ~S" (nth 1 (nth 12 bdf)) (cadr regleComplet) regle (cadr (caddr regleComplet)))
+      (setf (nth 1 (nth 12 bdf)) (cadr (caddr regleComplet)))
       )
   )
   (format t "~%")
@@ -196,7 +214,18 @@
   (cond 
    ((equal choix_chainage 'avant) 
       (avant_Profondeur bdf bdr nil)  
+      (if (equal (nth 1 (nth 12 bdf)) 'inconnu)
+        (progn
+        (format t "~%~% Error!Veuillez resaisir les donnees !~%~%")
+        (dolist (champ list_champs)
+          (init_Champs champ)
+        )
+        (moteur_inference 'avant bdf bdr)
       )
+   )
+   ((equal choix_chainage 'arriere)
+      (arriere_Largeur )
+   )
    )
 )
 
@@ -208,11 +237,11 @@
       ((not (null regleS))
           (push (car regleS) regleOld)
        (while (and (not retourner) regleS)
-            (let ((type_copy (nth 1 (nth 11 bdf))))  
+            (let ((type_copy (nth 1 (nth 12 bdf))))  
               (appliquer_regle (car regleS) bdr bdf)
               (setq retourner (avant_Profondeur bdf bdr regleOld))
               (if retourner (format t "~%Retourner avant d'appliquer ~S ~%" (pop regleS)))
-              (setf (nth 1 (nth 11 bdf)) type_copy)
+              (setf (nth 1 (nth 12 bdf)) type_copy)
               (if (not regleS) 
                    (return-from avant_Profondeur t)
                 (setq retourner nil)  
@@ -220,7 +249,7 @@
             )
        ))
       (t
-       (format t "~%Le raisonnement est termine, le resultat du raisonnement est TYPE == ~S" (nth 1 (nth 11 bdf)))
+       (format t "~%Le raisonnement est termine, le resultat du raisonnement est TYPE == ~S" (nth 1 (nth 12 bdf)))
        (format t "~%Les regles utilise sont : ")
        (print (reverse regleOld))
        t
@@ -230,3 +259,12 @@
 
 ;;2eme cas : chainage arriere en profondeur d'abord
 
+
+
+;;-----------------------------------------------------------------------------------------------------------------------
+;;------------------------------fonction client--------------------------------------------------------------------------
+;;-----------------------------------------------------------------------------------------------------------------------
+(defun corps_celeste ()
+   (init_BDF)
+   
+)
