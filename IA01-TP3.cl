@@ -277,6 +277,9 @@
 ;;该函数用于求两个list不同的部分（前一个相对于后一个的不同）
 (defun diff (L M) (cond ((null L) nil) ((member (car L) M :test 'equal) (diff (cdr L) M)) (t (cons (car L) (diff (cdr L) M)))))
 
+;;该函数用于拆分嵌套，最终将list转化为 ( ((...) (...))  ((...) (...))  ((...) (...)) ) 的形式
+(defun flatten (L) (if L (append (car L)(flatten (cdr L)))))
+
 ;;该函数用于逆推出所有能够推理得到list_conds的条件列表
 ;;比如，若list_conds为((Type 中子星)) , 如果条件(Cond1 Cond2) , (Cond3 Cond4)各自都能推出这个list_conds,
 ;;则该函数返回的result为((cond1 cond2) (cond3 cond4))
