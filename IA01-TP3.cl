@@ -9,18 +9,19 @@
               (R2 ((Type Etoile) (Reaction_nucleaire normal)) (Type etoile_sequence_principale))
               (R3 ((Etat_Matiere degeneree) (Reaction_nucleaire nil)) (Type etoile_compacte))
               (R4 ((Type etoile_compacte) (Masse (0.17 1.33))) (Type nain_blanc))
-              (R5 ((Type etoile_compacte) (Masse (1.35 2.1)) (Vitesse_Rot rapide)) (Type etoile_neutron))
-              (R6 ((Type etoile_neutron) (Signal_Impulsion periodique)) (Type pulsar))
-              (R7 ((Type etoile) (Reaction_nucleaire pres_de_fin) (Masse (0.3 8))) (Type geante_rouge))
-              (R8 ((Masse (> 3.3)) (Horizon_evenement t)) (Type trou_noir))
-              (R9 ((Masse (> 1000000)) (Position centre_galaxie)) (Type trou_noir))
-              (R10 ((Forme sphere) (Reaction_nucleaire nil) (Orbite_Etoile t) (Effacer_Voisine t)) (Type planete))
-              (R11 ((Etat_Matiere gaz) (Type planete)) (Type planete_jovienne))
-              (R12 ((Etat_Matiere solide) (Type planete)) (Type planete_tellurique))
-              (R13 ((Forme sphere) (Reaction_nucleaire nil) (Orbite_Etoile t) (Effacer_Voisine nil)) (Type planete_naine))
-              (R14 ((Type planete_naine) (Etat_Matiere gaz)) (Type planete_naine_gazeuse))
-              (R15 ((Forme incertain) (Reaction_nucleaire nil) (Orbite_Etoile t) (Effacer_Voisine nil)) (Type asteroide))
-              (R16 ((Reaction_nucleaire nil) (Orbite_Planete t) (Orbite_Etoile nil) (Effacer_Voisine nil)) (Type satellite))
+              (R5 ((Type etoile_compacte) (Masse (1.35 2.1))) (Type etoile_neutron))
+              (R6 ((Vitesse_Rot rapide) (Masse (1.35 2.1))) (Type etoile_neutron))
+              (R7 ((Type etoile_neutron) (Signal_Impulsion periodique)) (Type pulsar))
+              (R8 ((Type etoile) (Reaction_nucleaire pres_de_fin) (Masse (0.3 8))) (Type geante_rouge))
+              (R9 ((Masse (> 3.3)) (Horizon_evenement t)) (Type trou_noir))
+              (R10 ((Masse (> 1000000)) (Position centre_galaxie)) (Type trou_noir))
+              (R11 ((Forme sphere) (Reaction_nucleaire nil) (Orbite_Etoile t) (Effacer_Voisine t)) (Type planete))
+              (R12 ((Etat_Matiere gaz) (Type planete)) (Type planete_jovienne))
+              (R13 ((Etat_Matiere solide) (Type planete)) (Type planete_tellurique))
+              (R14 ((Forme sphere) (Reaction_nucleaire nil) (Orbite_Etoile t) (Effacer_Voisine nil)) (Type planete_naine))
+              (R15 ((Type planete_naine) (Etat_Matiere gaz)) (Type planete_naine_gazeuse))
+              (R16 ((Forme incertain) (Reaction_nucleaire nil) (Orbite_Etoile t) (Effacer_Voisine nil)) (Type asteroide))
+              (R17 ((Reaction_nucleaire nil) (Orbite_Planete t) (Orbite_Etoile nil) (Effacer_Voisine nil)) (Type satellite))
 ))
   ;;valeur possible:
     ;;Etat_matiere（物质状态） : solide(固态) / gaz（气态） / plasma（等离子体） / degeneree（简并态）
@@ -53,6 +54,7 @@
               ;;(Effacer_Voisine t)
               ;;(Horizon_evenement nil)
               ;;(Position incertain)
+              ;;(Type inconnu) 
               ;;))
 ;;Masse 数据以太阳为标准，如上例中地球质量为3.0e-6（0.000003）倍的太阳质量
 ;;Vitesse_Rot 数据单位为秒，即天体自转一圈所需的时间，如上例中地球自转（24*60*60=86400s）
@@ -67,16 +69,17 @@
 (setq *BDF* nil)
 
 (defun init_BDF ()
-  (format t "Veuillez saisir les données du corps céleste ：~%")
+  (format t "Veuillez saisir les donnees du corps celeste ：~%")
     (dolist (champ list_champs)
        (init_Champs champ)
-  )
+      )
+  (setq *BDF* (append *BDF* (list (list 'Type 'inconnu))))
   (format t "initialisation finish !")
 )
 
 (defun init_Champs (nom_Champ)
    (let ((valeur nil))
-     (format t "Quelle est le ~S matérielle du corps céleste ?~%" nom_Champ)
+     (format t "Quelle est le ~S materielle du corps celeste ?~%" nom_Champ)
      (setq valeur (read))
      (setq *BDF* (append *BDF* (list (list nom_Champ valeur))))
    )
@@ -134,7 +137,7 @@
    )
 )
 
-(defun Transform_Rot (bdf)
+(defun Transform_Vitesse_Rot (bdf)
   (let ((vitesse (cadr (assoc 'Vitesse_Rot bdf))))
        (if (<= vitesse 30)
            (setf (nth 1 (nth 7 bdf)) 'rapide)
@@ -158,11 +161,30 @@
                    nil (setq verifier nil)))
              )
          )
-         (if (equal verifier t) (push regle regleSuff))
+         (if (and 
+              (equal verifier t) 
+              (or
+                 (member (nth 11 bdf) (cadr regle) : test 'equal)
+                 (equal (nth 1 (nth 11 bdf)) 'inconnu)
+              ))
+              (push (car regle) regleSuff))
        )
     )
-    regleSUff
+    (reverse regleSUff)
   )
+)
+
+;;此函数用于执行regle
+(defun appliquer_regle (regle bdr bdf)
+  (if (equal (nth 1 (nth 11 bdf)) 'inconnu) 
+      (format t "~%----------------------------------------------------------------------------------~%"))
+  (if (member regle (regleSuffisant bdf bdr)) 
+    (let ((regleComplet (assoc regle bdr)))
+      (format t "~%Type ancienne : ~S ~% les conditions ~S appliquent le regle ~S ~%Type maintenant : ~S" (nth 1 (nth 11 bdf)) (cadr regleComplet) regle (cadr (caddr regleComplet)))
+      (setf (nth 1 (nth 11 bdf)) (cadr (caddr regleComplet)))
+      )
+  )
+  (format t "~%")
 )
 
 
@@ -170,27 +192,41 @@
 ;;----------------------------------------------moteur d'inference--------------------------------------------------------
 ;;------------------------------------------------------------------------------------------------------------------------
 
-(defun moteur_inference (choix_chainage)
-   (cond
-     ((equal choix_chainage 'avant)
-        (let ((choix nil))
-          (format t "Chainage avant en profondeur d'abord ou en largeur d'abord ? ~%")
-          (setq choix (read))
-          (if (equal choix 'profondeur) (avant_Profondeur *BDF* *BDR*) (avant_Largeur *BDF* *BDR*))
-        )
-     )
-     ((equal choix_chainage 'arriere) (arriere_Profondeur *BDF* *BDR*))
+(defun moteur_inference (choix_chainage bdf bdr)
+  (cond 
+   ((equal choix_chainage 'avant) 
+      (avant_Profondeur bdf bdr nil)  
+      )
    )
-   (format t "Finish !")
 )
 
 ;;1er cas : chainage avant en profondeur d'abord
-(defun avant_Profondeur (bdf bdr)
-  (let ((regleS (regleSuffisant bdf bdr)))
-     ()
-  )
-)
-
+(defun avant_Profondeur (bdf bdr regleOld)
+  (let ((regleS (regleSuffisant bdf bdr)) 
+        (retourner nil))
+    (cond 
+      ((not (null regleS))
+          (push (car regleS) regleOld)
+       (while (and (not retourner) regleS)
+            (let ((copy (nth 1 (nth 11 bdf))))  
+              (appliquer_regle (car regleS) bdr bdf)
+              (setq retourner (avant_Profondeur bdf bdr regleOld))
+              (if retourner (format t "~%Retourner avant d'appliquer ~S ~%" (pop regleS)))
+              (setf (nth 1 (nth 11 bdf)) copy)
+              (if (not regleS) 
+                   (return-from avant_Profondeur t)
+                (setq retourner nil)  
+              )
+            )
+       ))
+      (t
+       (format t "~%Le raisonnement est termine, le resultat du raisonnement est TYPE == ~S" (nth 1 (nth 11 bdf)))
+       (format t "~%Les regles utilise sont : ")
+       (print (reverse regleOld))
+       t
+       )
+    )
+ ))
 
 ;;2eme cas : chainage arriere en profondeur d'abord
 
