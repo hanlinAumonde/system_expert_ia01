@@ -76,7 +76,7 @@
       )
   (setq *BDF* (append *BDF* (list (list 'Type 'inconnu))))
   (verifier_donnee *BDF*)
-  (format t "initialisation finish !")
+  (format t "~%------initialisation finish !------~%")
 )
 
 (defun init_Champs (nom_Champ)
@@ -113,7 +113,7 @@
   (Transform_Matiere bdf)
   (Transform_Masse bdf)
   (Transform_Vitesse_Rot bdf)
-  (format t "Transformation finish")
+  (format t "~%------Transformation finish !------~%")
 )
 
 (defun Transform_Matiere (bdf)
