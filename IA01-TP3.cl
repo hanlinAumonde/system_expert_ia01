@@ -185,11 +185,12 @@
 )
 
 ;;1er cas : chainage avant en profondeur d'abord
-(defun )
+(defun avant_Profondeur (bdf bdr)
+  (let ((regleS (regleSuffisant bdf bdr)))
+     ()
+  )
+)
 
 
-;;2eme cas : chainage avant en largeur d'abord
+;;2eme cas : chainage arriere en profondeur d'abord
 
-;;3eme cas : chainage arriere en profondeur d'abord
-
-;;pour le 4eme cas(chainage arriere en largeur d'abord) , parce que dans notre base de regles , le plupart du types est inféré par une seule règle(Parce que différents types de corps célestes ont leurs propres caractéristiques typiques) , il est plus difficile et compatible de construire cette moteur , donc on ne pas choisir cette moteur.
