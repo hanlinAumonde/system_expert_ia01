@@ -319,7 +319,10 @@
      (dolist (x list_cadidates)
         (format t "~S ~%-------------------------------------------------------~%" x)   ;;显示当前未经确认的所有conditions
         (if (equal (verifier_conditions x bdf) t) 
-           (return-from arriere_Largeur1 "Conditions verifiees avec succes !") ;;若bdf能够满足条件列表中任意一组条件，则显示成功并退出递归
+            (progn
+              (format t "Conditions verifiees avec succes !~%~%")
+              (return-from arriere_Largeur1 nil)
+            ) ;;若bdf能够满足条件列表中任意一组条件，则显示成功并退出递归
           (format t "et on n'a pas encore verifier les conditions dans le base de faits~%~%") ;;不满足则返回提示并继续递归
         )
      )
@@ -342,14 +345,22 @@
 ;;-----------------------------------------------------------------------------------------------------------------------
 (defun corps_celeste ()   
    (format t "~%******************************************programme commencer*********************************************~%")
-   (while (equal programme 0)  
+   (let ((programme 0))
+    (while (equal programme 0)  
      (init_BDF)
      (Transformation_donnee *BDF*)
-     (format t "Entrez votre choix de la chainage (avant ou arriere) :~%")
-     (setq votreChoix (read))
-     (moteur_inference votreChoix *BDF* *BDR*)
+     (let ((autrechoix 0) (votreChoix nil)) 
+      (while (equal autrechoix 0) 
+       (format t "Entrez votre choix de la chainage (avant ou arriere) :~%")
+       (setq votreChoix (read))
+       (moteur_inference votreChoix *BDF* *BDR*)
+       (format t "~% Voulez-vous appliquer l'autre chainage sur ce BDF (oui : 0 / non : 1)?~%")  
+       (setq autrechoix (read))
+      )
+     )  
      (format t "~%Voulez-vous quitter le programme ? (Entrez 1 pour quitter , entrez 0 pour continuer)~%")
      (setq programme (read))
+    )
    )
      (format t "~%******************************************programme terminer*********************************************~%")
 )
