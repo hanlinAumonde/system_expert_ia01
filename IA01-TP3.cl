@@ -67,9 +67,8 @@
 
 (setq list_champs '(Etat_matiere Forme Mode_Lumineux Orbite_Etoile Orbite_Planete Reaction_nucleaire Masse Vitesse_Rot Effacer_Voisine Horizon_evenement Position Signal_Impulsion))
 
-(setq *BDF* nil)
-
 (defun init_BDF ()
+  (setq *BDF* nil)
   (format t "Veuillez saisir les donnees du corps celeste ：~%")
     (dolist (champ list_champs)
        (init_Champs champ)
@@ -334,7 +333,7 @@
 )
 
 (defun arriere_Largeur (type_but bdf bdr)
-    (arriere_Largeur1 (list type_but) bdf bdr nil)
+    (arriere_Largeur1 (list (list (list 'Type type_but))) bdf bdr nil)
 )
 
 
@@ -343,10 +342,14 @@
 ;;-----------------------------------------------------------------------------------------------------------------------
 (defun corps_celeste ()   
    (format t "~%******************************************programme commencer*********************************************~%")
-   (init_BDF)
-   (Transformation_donnee *BDF*)
-   (format t "Entrez voytre choix de la chainage (avant ou arriere) :~%")
-   (setq votreChoix (read))
-   (moteur_inference votreChoix *BDF* *BDR*)
-   (format t "~%******************************************programme terminer*********************************************~%")
+   (while (equal programme 0)  
+     (init_BDF)
+     (Transformation_donnee *BDF*)
+     (format t "Entrez votre choix de la chainage (avant ou arriere) :~%")
+     (setq votreChoix (read))
+     (moteur_inference votreChoix *BDF* *BDR*)
+     (format t "~%Voulez-vous quitter le programme ? (Entrez 1 pour quitter , entrez 0 pour continuer)~%")
+     (setq programme (read))
+   )
+     (format t "~%******************************************programme terminer*********************************************~%")
 )
