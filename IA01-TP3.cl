@@ -112,7 +112,7 @@
   (Transform_Matiere bdf)
   (Transform_Masse bdf)
   (Transform_Vitesse_Rot bdf)
-  (format t "~%------Transformation finish !------~%")
+  (format t "~%------Transformation finish !------~%~%")
 )
 
 (defun Transform_Matiere (bdf)
