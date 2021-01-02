@@ -430,7 +430,7 @@
        (format t "Entrez votre choix de la chainage (avant ou arriere) :~%")
        (setq votreChoix (read))
        (moteur_inference votreChoix *BDF* *BDR*)
-       (format t "~% Voulez-vous appliquer l'autre chainage sur ce BDF (oui : 0 / non : 1)?~%")  
+       (format t "~%Voulez-vous appliquer l'autre chainage sur ce BDF (oui : 0 / non : 1)?~%")  
        (setq autrechoix (read))
       )
      )  
