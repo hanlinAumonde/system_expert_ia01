@@ -10,7 +10,7 @@
               (R3 ((Etat_Matiere degeneree) (Reaction_nucleaire nil)) (Type etoile_compacte))
               (R4 ((Type etoile_compacte) (Masse (0.17 1.33))) (Type nain_blanc))
               (R5 ((Type etoile_compacte) (Masse (1.35 2.1))) (Type etoile_neutron))
-              (R6 ((Vitesse_Rot rapide) (Masse (1.35 2.1))) (Type etoile_neutron))
+              (R6 ((Etat_Matiere degeneree) (Vitesse_Rot rapide) (Masse (1.35 2.1))) (Type etoile_neutron))
               (R7 ((Type etoile_neutron) (Signal_Impulsion periodique)) (Type pulsar))
               (R8 ((Type etoile) (Reaction_nucleaire pres_de_fin) (Masse (0.3 8))) (Type geante_rouge))
               (R9 ((Masse (> 3.3)) (Horizon_evenement t)) (Type trou_noir))
@@ -74,7 +74,6 @@
        (init_Champs champ)
       )
   (setq *BDF* (append *BDF* (list (list 'Type 'inconnu))))
-  (verifier_donnee *BDF*)
   (format t "~%------initialisation finish !------~%")
 )
 
@@ -86,22 +85,6 @@
    )
 )
 
-;;此函数用于确认用户输入的bdf数据类型是否符合要求（不需在意文字内容不在valeurpossible的情况，仅确认输入具体数值的项类型是否正确）
-(defun verifier_donnee (bdf)
-  (dolist (x bdf)
-      (if (or 
-            (equal (car x) 'Masse) 
-            (equal (car x) 'Vitesse_Rot)
-          )
-          (if (not (floatp (cadr x)))
-            (progn
-              (format t "Erreur-type : Resaisir le champ ~S svp" (car x))
-              (setf (cadr x) (read))
-            )
-          )
-      )
-  )
-)
 
 ;;-------------------------------------------------------------------------------------------------------------------------
 ;;-------------------------------------------------fonction utile----------------------------------------------------------
@@ -129,7 +112,8 @@
           (equal matiere 'helium)
           )
         (setf (nth 1 (nth 0 bdf)) 'gaz)) 
-      )
+       (t (setf (nth 1 (nth 0 bdf)) 'inconnu))
+     )
   )    
 )
 
@@ -156,10 +140,13 @@
 
 (defun Transform_Vitesse_Rot (bdf)
   (let ((vitesse (cadr (assoc 'Vitesse_Rot bdf))))
+    (if (or (floatp vitesse) (numberp vitesse))
        (if (<= vitesse 30)
            (setf (nth 1 (nth 7 bdf)) 'rapide)
          (setf (nth 1 (nth 7 bdf)) 'normal)
        )
+      (setf (nth 1 (nth 7 bdf)) 'inconnu)
+    )
   )    
 )
 
@@ -246,10 +233,15 @@
             )
        ))
       (t
-       (format t "~%Le raisonnement est termine, le resultat du raisonnement est TYPE == ~S" (nth 1 (nth 12 bdf)))
-       (format t "~%Les regles utilise sont : ")
-       (print (reverse regleOld))
-       t
+        (if (not (null regleOld))
+          (progn 
+           (format t "~%Le raisonnement est termine, le resultat du raisonnement est TYPE == ~S" (nth 1 (nth 12 bdf)))
+           (format t "~%Les regles utilise sont : ")
+           (print (reverse regleOld))
+           t
+          )
+         (format t "~%Erreur ! Donnee invalide !~%")
+        )
        )
     )
  ))
