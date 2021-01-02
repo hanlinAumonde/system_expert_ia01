@@ -232,19 +232,18 @@
               )
             )
        ))
+      ((and (null regleOld) (null regleS))
+           (format t "~%Erreur ! Donnees insuffisantes ou erreur !~%")
+      )
       (t
-        (if (not (null regleOld))
-          (progn 
-           (format t "~%Le raisonnement est termine, le resultat du raisonnement est TYPE == ~S" (nth 1 (nth 12 bdf)))
-           (format t "~%Les regles utilise sont : ")
-           (print (reverse regleOld))
-           t
-          )
-         (format t "~%Erreur ! Donnee invalide !~%")
-        )
-       )
+        (format t "~%Le raisonnement est termine, le resultat du raisonnement est TYPE == ~S" (nth 1 (nth 12 bdf)))
+        (format t "~%Les regles utilise sont : ")
+        (print (reverse regleOld))
+        t
+      )
     )
- ))
+  )
+)
 
 ;;2eme cas : chainage arriere en profondeur d'abord
 
