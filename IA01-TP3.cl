@@ -216,7 +216,6 @@
    )
 )
 
-;;1er cas : chainage avant en profondeur d'abord
 
 ;;此函数用于寻找对于当前bdf来说可以用于进行下一步推理的regle列表
 (defun regleSuffisant (bdf bdr)
@@ -270,6 +269,9 @@
        res
     )
 )
+
+
+;;1er cas : chainage avant en profondeur d'abord
 
 ;;此函数用于执行一条regle
 (defun appliquer_regle (regle bdr bdf)
@@ -339,8 +341,6 @@
       )  
   )
 
-;;该函数用于求两个list不同的部分（前一个相对于后一个的不同）
-(defun diff (L M) (cond ((null L) nil) ((member (car L) M :test 'equal) (diff (cdr L) M)) (t (cons (car L) (diff (cdr L) M)))))
 
 ;;该函数用于拆分嵌套，最终将list转化为 ( ((...) (...))  ((...) (...))  ((...) (...)) ) 的形式
 (defun flatten (L) (if L (append (car L)(flatten (cdr L)))))
@@ -385,7 +385,7 @@
    res)
 )
 
-(defun arriere_Largeur1 (list_cadidates bdf bdr CondsOld)
+(defun arriere_Largeur1 (list_cadidates bdf bdr)
      (if (null list_cadidates) 
          (format t "~%On ne peut pas verifier le type BUT~%")
        (format t "~%On a les conditions maintenant :~%"))
@@ -402,15 +402,14 @@
      (format t "~%**************************************************************~%")
    (cond 
      ((not list_cadidates) nil)
-     (t (arriere_Largeur1 (diff (flatten (mapcar #'(lambda(xx) (successeur xx bdr)) list_cadidates)) CondsOld) bdf bdr 
-                                (append list_cadidates CondsOld))
+     (t (arriere_Largeur1 (flatten (mapcar #'(lambda(xx) (successeur xx bdr)) list_cadidates))  bdf bdr)
      )
    )
 )
 
 (defun arriere_Largeur (type_but bdf bdr)
   (if (equal (verifier_compatible bdf bdr) t)
-      (arriere_Largeur1 (list (list (list 'Type type_but))) bdf bdr nil)
+      (arriere_Largeur1 (list (list (list 'Type type_but))) bdf bdr)
     (format t "~%Erreur ! Donnee invalide !~%")
   )
 )
