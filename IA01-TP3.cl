@@ -7,14 +7,14 @@
 (setq *BDR* '(
               (R1 ((Etat_Matiere plasma) (Forme sphere) (Mode_Lumineux radiation)) (Type etoile))   
               (R2 ((Type Etoile) (Reaction_nucleaire normal)) (Type etoile_sequence_principale))
-              (R3 ((Etat_Matiere degeneree) (Reaction_nucleaire nil)) (Type etoile_compacte))
+              (R3 ((Etat_Matiere degeneree) (Forme sphere) (Reaction_nucleaire nil)) (Type etoile_compacte))
               (R4 ((Type etoile_compacte) (Masse (0.17 1.33))) (Type nain_blanc))
               (R5 ((Type etoile_compacte) (Masse (1.35 2.1))) (Type etoile_neutron))
-              (R6 ((Vitesse_Rot rapide) (Masse (1.35 2.1))) (Type etoile_neutron))
+              (R6 ((Vitesse_Rot rapide) (Forme sphere) (Masse (1.35 2.1))) (Type etoile_neutron))
               (R7 ((Type etoile_neutron) (Signal_Impulsion periodique)) (Type pulsar))
               (R8 ((Type etoile) (Reaction_nucleaire pres_de_fin) (Masse (0.3 8))) (Type geante_rouge))
-              (R9 ((Masse (> 3.3)) (Horizon_evenement t)) (Type trou_noir))
-              (R10 ((Masse (> 1000000)) (Position centre_galaxie)) (Type trou_noir))
+              (R9 ((Masse (> 3.3)) (Forme sphere) (Horizon_evenement t)) (Type trou_noir))
+              (R10 ((Masse (> 1000000)) (Forme sphere) (Position centre_galaxie)) (Type trou_noir))
               (R11 ((Forme sphere) (Reaction_nucleaire nil) (Orbite_Etoile t) (Effacer_Voisine t)) (Type planete))
               (R12 ((Etat_Matiere gaz) (Type planete)) (Type planete_jovienne))
               (R13 ((Etat_Matiere solide) (Type planete)) (Type planete_tellurique))
@@ -23,6 +23,7 @@
               (R16 ((Forme incertain) (Reaction_nucleaire nil) (Orbite_Etoile t) (Effacer_Voisine nil)) (Type asteroide))
               (R17 ((Reaction_nucleaire nil) (Orbite_Planete t) (Orbite_Etoile nil) (Effacer_Voisine nil)) (Type satellite))
 ))
+
   ;;valeur possible:
     ;;Etat_matiere（物质状态） : solide(固态) / gaz（气态） / plasma（等离子体） / degeneree（简并态）
     ;;Mode_Lumineux（发光模式） : radiation(辐射) / nil
@@ -237,6 +238,31 @@
   )
 )
 
+;;此函数用于判断上一个函数得出的regle列表所进行的推理是否会产生数据冲突
+;;比如一组bdf中的数据从知识上不应该同时推出type为中子星和type为行星,但如果用户输入的数据在逻辑上有错就有可能造成这种情况
+;;该函数就是用来避免这种情况的
+
+(setq type_non_compatible '((etoile etoile_neutron) (etoile trou_noir) (etoile planete) (etoile planete_naine) (etoile satellite)
+                            (etoile_neutron planete) (etoile_neutron planete_naine) (etoile_neutron satellite)
+                            (trou_noir planete_naine) (trou_noir planete) (trou_noir satellite)
+                           )
+                      
+(defun verifier_compatible (bdf bdr)
+    (let ((reglesuff_1er (regleSuffisant bdf bdr)) (list_type nil) (res t))
+       (dolist (regle reglesuff_1er)
+          (setq list_type (append list_type (list (cadr (assoc 'Type (assoc regle bdr))))))
+       )
+       (dolist (champ type_non_compatible)
+          (if (and 
+                (member (car champ) list_type) 
+                (member (cadr champ) list_type))
+             (setq res nil)      
+          )
+       )
+       res
+    )
+)
+
 ;;此函数用于执行一条regle
 (defun appliquer_regle (regle bdr bdf)
   (if (equal (nth 1 (nth 12 bdf)) 'inconnu) 
@@ -250,7 +276,7 @@
   (format t "~%")
 )
 
-(defun avant_Profondeur (bdf bdr regleOld)
+(defun avant_Profondeur1 (bdf bdr regleOld)
   (let ((regleS (regleSuffisant bdf bdr)) 
         (retourner nil))
     (cond 
@@ -282,6 +308,13 @@
       )
     )
   )
+)
+
+(defun avant_Profondeur (bdf bdr)
+   (if (equal (verifier_compatible) t)
+       (avant_Profondeur1 bdf bdf nil)
+      (format t "~%Erreur ! Donnee invalide !~%")
+   )
 )
 
 ;;2eme cas : chainage arriere en profondeur d'abord
@@ -366,7 +399,10 @@
 )
 
 (defun arriere_Largeur (type_but bdf bdr)
-    (arriere_Largeur1 (list (list (list 'Type type_but))) bdf bdr nil)
+  (if (equal (verifier_compatible) t)
+      (arriere_Largeur1 (list (list (list 'Type type_but))) bdf bdr nil)
+    (format t "~%Erreur ! Donnee invalide !~%")
+  )
 )
 
 
