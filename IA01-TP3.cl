@@ -10,7 +10,7 @@
               (R3 ((Etat_Matiere degeneree) (Reaction_nucleaire nil)) (Type etoile_compacte))
               (R4 ((Type etoile_compacte) (Masse (0.17 1.33))) (Type nain_blanc))
               (R5 ((Type etoile_compacte) (Masse (1.35 2.1))) (Type etoile_neutron))
-              (R6 ((Etat_Matiere degeneree) (Vitesse_Rot rapide) (Masse (1.35 2.1))) (Type etoile_neutron))
+              (R6 ((Vitesse_Rot rapide) (Masse (1.35 2.1))) (Type etoile_neutron))
               (R7 ((Type etoile_neutron) (Signal_Impulsion periodique)) (Type pulsar))
               (R8 ((Type etoile) (Reaction_nucleaire pres_de_fin) (Masse (0.3 8))) (Type geante_rouge))
               (R9 ((Masse (> 3.3)) (Horizon_evenement t)) (Type trou_noir))
@@ -39,6 +39,7 @@
     ;;Orbite_Etoile（绕恒星运行） : t / nil
     ;;Effacer_Voisine（清空轨道附近区域） :  t / nil
     ;;Orbite_Planete（绕行星运行） : t / nil
+    ;;Signal_Impulsion（脉冲信号） :  periodique / normal
 
 ;;Exemple d'un base de faits
 ;;以地球的数据为例
@@ -79,9 +80,47 @@
 
 (defun init_Champs (nom_Champ)
    (let ((valeur nil))
-     (format t "Quelle est le ~S materielle du corps celeste ?~%" nom_Champ)
-     (setq valeur (read))
-     (setq *BDF* (append *BDF* (list (list nom_Champ valeur))))
+      (format t "Quelle est le ~S du corps celeste ?~%" nom_Champ)
+      (cond 
+        ((equal nom_Champ 'Etat_matiere) 
+          (format t "(roche / glace / metal / hydrogene / helium / plasma / degeneree / inconnu)~%")      
+        )
+        ((equal nom_Champ 'Forme) 
+          (format t "(sphere / irregulier / inconnu)~%")
+        )
+        ((equal nom_Champ 'Mode_Lumineux) 
+          (format t "(radiation / nil / inconnu)~%")
+        )
+        ((equal nom_Champ 'Orbite_Etoile) 
+          (format t "(t / nil / inconnu)~%")
+        )
+        ((equal nom_Champ 'Orbite_Planete) 
+          (format t "(t / nil / inconnu)~%")
+        )
+        ((equal nom_Champ 'Reaction_nucleaire) 
+          (format t "(normal / nil / pres_de_fin / inconnu)~%")
+        )
+        ((equal nom_Champ 'Masse) 
+          (format t "(Entrez un nombre ou reel)~%")
+        )
+        ((equal nom_Champ 'Vitesse_Rot) 
+          (format t "(Entrez un nombre ou reel)~%")
+        )
+        ((equal nom_Champ 'Effacer_Voisine) 
+          (format t "(t / nil / inconnu)~%")
+        )
+        ((equal nom_Champ 'Horizon_evenement) 
+          (format t "(t / nil / inconnu)~%")
+        )
+        ((equal nom_Champ 'Position) 
+          (format t "(centre_galaxie / incertain / inconnu)~%")
+        )
+        ((equal nom_Champ 'Signal_Impulsion) 
+          (format t "(periodique / normal / nil / inconnu)~%")
+        )
+      )
+      (setq valeur (read))
+      (setq *BDF* (append *BDF* (list (list nom_Champ valeur)))) 
    )
 )
 
