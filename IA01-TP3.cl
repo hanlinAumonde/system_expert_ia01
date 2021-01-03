@@ -164,9 +164,10 @@
   )    
 )
 
+
 (defun Transform_Masse (bdf)
   (let ((masse (cadr (assoc 'Masse bdf))) (list_interval_masse nil))
-       (if (equal masse 'inconnu) 
+       (if (not (or (floatp masse) (numberp masse)))
           (progn
             (setf (nth 1 (nth 6 bdf)) nil)
             (return-from Transform_Masse nil)))  
