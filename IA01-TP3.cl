@@ -69,7 +69,8 @@
 ;;---------------------------------------------initialisation du BDF-----------------------------------------------------
 ;;-----------------------------------------------------------------------------------------------------------------------
 
-(setq list_champs '(Etat_matiere Forme Mode_Lumineux Orbite_Etoile Orbite_Planete Reaction_nucleaire Masse Vitesse_Rot Effacer_Voisine Horizon_evenement Position Signal_Impulsion))
+(setq list_champs '(Etat_matiere Forme Mode_Lumineux Orbite_Etoile Orbite_Planete Reaction_nucleaire Masse 
+                    Vitesse_Rot Effacer_Voisine Horizon_evenement Position Signal_Impulsion))
 
 (defun init_BDF ()
   (setq *BDF* nil)
