@@ -331,7 +331,7 @@
    )
 )
 
-;;2eme cas : chainage arriere en profondeur d'abord
+;;2eme cas : chainage arriere en largeur d'abord
 
   ;;该函数用于寻找所有能够推出type_but的regle并写出对应条件（每一个regle的对应条件放在一个括号中）
   (defun inference_inverse (type_but bdr)
